@@ -1,0 +1,188 @@
+方差分析（Analysis of Variance, ANOVA): 主要用来检测不同组之间是否有差异，是R.A.Fister首先提出。是统计学里一个常用的方法，一般用于两个及两个以上样本均数差别的显著性检验。
+
+### 引例
+
+例如，我们对全国几个主要城市的收入感兴趣，经过抽样之后会有这样的数据：
+
+北京: $X_{11} X_{12} . . . X_{1n1}$
+
+上海: $X_{21} X_{22} . . . X_{2n2}$
+
+广州: $X_{31} X_{32} . . . X_{3n3}$
+
+深圳: $X_{41} X_{42} . . . X_{4n4}$
+. . . . . .   . . .
+
+注意数据量$n1, n2, . . .n$可能不相等。 我们感兴趣的问题是：**这几个城市的人均收入是否有显著差异？如果是，那些城市与其他显著不同？**
+
+某食品公司对一种食品设计了四种不同的包装，为了考察哪种包装最受顾客欢迎，选取了四个商店进行跟踪测试，数据如下：
+
+&emsp;&emsp;包装A1:&emsp; 12&emsp; 18&emsp; 11&emsp; 14  
+&emsp;&emsp;包装A2:&emsp; 14&emsp; 12&emsp; 13&emsp; 12  
+&emsp;&emsp;包装A3:&emsp; 19&emsp; 17&emsp; 21&emsp; 18  
+&emsp;&emsp;包装A4:&emsp; 24&emsp; 30&emsp; 23&emsp; 21  
+
+类似的，这里也可以有更多地商店数据。下面代码展示了四个包装对应的销售均值：
+
+```r
+## [1] 13.75 12.75 18.75 24.50
+```
+
+### 方差分析模型
+刚刚的两个例子涉及到的都是单因素方差分析，一般的我们可以假设某个因素有$g$个分组，对应的样本数据为：
+$$
+  \begin{matrix}
+        Group 1: & X_{11} & . . . & X_{1n1} \\
+        Group 2: & X_{21} & . . . & X_{2n2} \\
+        · · · & · · · & · · · & · · · \\
+        Group g: & X_{g1}  & . . . & X_{gn_{g}} 
+  \end{matrix} 
+$$
+
+对于每个组，我们可以假定数据满足正态分布，既
+$$
+  \begin{matrix}
+         X_{11} & . . . & X_{1n1} & \sim N(\mu_{1}, \sigma^2) \\
+         X_{21} & . . . & X_{2n2} & \sim N(\mu_{2}, \sigma^2) \\
+          · · · &· · · & · · · & · · · \\
+         X_{g1}  & . . . & X_{gn_{g}} & \sim N(\mu_{g}, \sigma^2)
+  \end{matrix} \tag{1}
+$$
+
+### 方差分析与回归分析
+我们可以用类似回归分析模型的表示方式：
+$$X_{ij} = \mu_i + \epsilon_{ij} , i = 1, . . . , g, j = 1, . . . , n_i
+,$$
+
+这里的$\epsilon_{ij} ∼ N(0, \sigma^2
+)$。 方差分析关心的问题是：
+$$H_0 : \mu_1 = · · · = \mu_g. $$
+这里$g$组可以理解为因素的$g$个水平，而$\mu_i$为因素不同水平下的实验指标，所以方差分析其实研究的就是不同水平下是否有差异化的假设检验问题。
+
+### 方差分析与假设检验
+
+如果特别的$g = 2$，方差分析问题就是$H_0 : \mu_1 = \mu_2$， 这也就是两样本均值检验问题。 而对于一般的$g > 2$，方差分析问题也可以理解成很多个（小的）假设检验问题：$$Q_{ij}  \quad  H_0 : \mu_i = \mu_j
+, i, j = 1, . . . , g. $$
+
+当然，我们可以检验每一个$Q_{ij}$。如果所有的都成立，那么对应的认为原始的多个假设检验成立。对于例题，我们有：
+
+![](https://ws1.sinaimg.cn/large/6f786648gy1fsoagy4hwcj20fr06nglk.jpg)
+
+把四个包装对应的销售数据做两两地均值检验，我们有对应的p-value结果如下：
+$$(1, 2) : 0.5743 \quad (1, 3) : 0.03968 \quad (1, 4) : 0.005465$$
+
+$$(2, 3) : 0.00206 \quad (2, 4) : 0.007022 \quad (3, 4) : 0.05144$$
+
+所以在$95\%$水平下，不拒绝 $\mu_1 = \mu_2, \mu_3 = \mu_4$。 
+
+在$99\%$水平下， 不拒绝 $\mu_1 = \mu_2, \mu_1 = \mu_3, \mu_3 = \mu_4$。
+
+*注： 把一个假设检验分拆成多个，会造成误差积累，并不能真正替代原始的问题。*
+
+### 方差分析原理
+
+对于每一组数据 $X_{i1}, . . . , X_{in_{i}}$， 我们考虑组内的样本均值和样本方差：$$\bar{X}_{i} = \frac{1}{n_{i}}\sum_{j=1}^{n_{i}}X_{ij}, S^2_{i} = \frac{1}{n_{i}-1}\sum_{j=1}^{n_{i}}(X_{ij}-\bar{X})^2,$$
+
+以及全体数据的样本均值和样本方差：$$ \bar{X} = \frac{1}{n} \sum_{i=1}^{g}\sum_{j=1}^{n_{i}} X_{ij}, S^2 = \frac{1}{n-1} \sum_{i=1}^{g}\sum_{j=1}^{n_{i}} (X_{ij}-\bar{X})^2, $$
+
+对应组内样本均值和总体样本均值，我们可以把观察样本$X_{ij}$分解成
+$$X_{ij} = \bar {X} + (\bar {X}_{i} - \bar {X}) + ({X}_{ij} - \bar {X}_{i}) $$
+即观测值 = 总的样本平均 + 组间样本均值差 + 残差。
+
+对应的，我们可以考虑以下几个统计量：
+
+ - 总平方和: $S^2_{T} = \sum_{i=1}^{g}\sum_{j=1}^{n_{i}} (X_{ij}-\bar{X})^2$
+ -  组间差平方和:$S^2_{A} = \sum_{i=1}^{g} n_{i}(\bar X_{i}-\bar{X}_{})^2$
+ -  组内差平方和:$S^2_{E} = \sum_{i=1}^{g}\sum_{j=1}^{n_{i}} (X_{ij}-\bar{X}_{i})^2$
+
+其中，我们有**平方和分解公式**：$$ S^2_{T} = S^2_{A} + S^2_{E} $$
+
+### 构造统计量
+
+对于组内差，我们有$\sum_{j=1}^{ n_{i}}(X_{ij}-\bar{X}_i{})^2/\sigma ^2 \sim  \chi^2 _{n_{i}-1}$，再由每组数据相互独立，对于组内差平方和，我们有$$S^{2}_{E}/\sigma ^{2} \sim \chi ^{2}_{n-g}$$
+
+而对于总平方和，当原假设成立时候，即$\mu_1 = · · · = \mu_g$, 所有观察数据可以视为$N(\mu_1, \sigma ^ 2
+)$的观察样本，所以，$$S^{2}_{T}/\sigma ^{2} \sim \chi ^{2}_{n-1}$$
+
+对于组间差平方和，我们有$$S^{2}_{A}/\sigma ^{2} \sim \chi ^{2}_{g-1}$$
+
+### 单因素方差分析检验统计量
+
+当原假设不成立时候，$S^{2}_{A}$应该很大。反过来，原假设成立时候$S^{2}_{A}$应该很小，所以检验统计量可以基于$S^{2}_{A}$。 为了消除未知的$\sigma ^ 2$, 我们考虑F统计量：$$F = \frac {S^{2}_{A}(g-1)}{S^{2}_{E}(n-g)}$$
+
+在原假设成立时候，我们有$F \sim F_{g−1,n−g}$. 在给定显著水平$\alpha$下，拒绝域为$$
+K0 = {F > F_{1−α}(g − 1, n − g)}$$
+
+### 方差分析结果
+
+```{r}
+x1 <- c(12, 18, 11, 14)
+x2 <- c(14, 12, 13, 12)
+x3 <- c(19, 17, 21, 18)
+x4 <- c(24, 30, 23, 21)
+
+df <- data.frame(sales = c(x1, x2, x3, x4), 
+                 group = factor(c(rep(1,4),rep(2,4),rep(3,4),rep(4,4))))
+
+library(dplyr)
+group_by(df, group) %>%
+  summarise(
+    count = n(),
+    mean = mean(sales),
+    sd = sd(sales)
+  )
+```
+```{r}
+# Box plots
+# ++++++++++++++++++++
+# Plot sales by kind and color by kind
+library(ggpubr)
+ggboxplot(df, x = "group", y = "sales", 
+          color = "group", palette = c("#00AFBB", "#E7B800", "#FC4E07", "#123456"),
+          order = c("1", "2", "3", "4"),
+          ylab = "sales", xlab = "group")
+```
+
+![](https://ws1.sinaimg.cn/large/6f786648gy1fsoxcjsj0hj211c0qoq2x.jpg)
+```{r}
+# Mean plots
+# ++++++++++++++++++++
+# Plot sales by group
+# Add error bars: mean_se
+# (other values include: mean_sd, mean_ci, median_iqr, ....)
+ggline(df, x = "group", y = "sales", 
+       add = c("mean_se", "jitter"), 
+       order = c(1, 2, 3, 4),
+       ylab = "sales", xlab = "group")
+```
+![](https://ws1.sinaimg.cn/large/6f786648gy1fsoxcki5b1j211c0qodft.jpg)
+```{r}
+# Compute the analysis of variance
+res.aov <- aov(sales ~ group, df)
+# Summary of the analysis
+summary(res.aov)
+```
+
+![](https://ws1.sinaimg.cn/large/6f786648gy1fsoesv7vlzj20f405hq2v.jpg)
+
+### 多因素方差分析
+
+我们首先以两因素为例：
+$$(i, j) X_{ij1}, . . . , X_{ijn_{ij}} , i=1,...,r, r=1,...,s.$$
+
+对于每个组，我们可以假定数据满足正态分布，既
+$$X_{ij1}, . . . , X_{ijn_{ij}} \sim N(\mu_{ij}, \sigma ^2)$$
+
+回归数据的表示方式：
+$$X_{ijk} = \mu_{ij} + \epsilon_{ijk}, i = 1, . . . ,r, j = 1, . . . ,s, k = 1, . . . , n_{ij}$$
+
+这里的$\epsilon_{ijk} ∼ N(0, \sigma^2
+)$. 我们关心的问题是：
+$$H0 : \mu_{11} = · · · = \mu_{rs} . $$
+
+类似的可以构造出组间差平方和和组内差平方和以及对应的F统计量等。
+
+
+#### 参考文献
+
+- *[方差分析](http://math.sjtu.edu.cn/faculty/chengwang/files/2015spring/方差分析.pdf)*
