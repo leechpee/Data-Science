@@ -177,5 +177,5 @@ $$H0 : \mu_{11} = · · · = \mu_{rs} . $$
 
 #### 参考文献
 
-- *[方差分析](http://math.sjtu.edu.cn/faculty/chengwang/files/2015spring/%E6%96%B9%E5%B7%AE%E5%88%86%E6%9E%90.pdf
+- *[方差分析](http://math.sjtu.edu.cn/faculty/chengwang/files/2015spring/%E6%96%B9%E5%B7%AE%E5%88%86%E6%9E%90.pdf)*
 
